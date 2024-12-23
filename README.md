@@ -6,7 +6,7 @@
 
 本实验为清华大学高级操作系统课程作业，参考 [rCore-Tutorial-Book-v3](https://rcore-os.cn/rCore-Tutorial-Book-v3/index.html) 进行学习，Fork 自 [rCore-Tutorial-v3](https://github.com/rcore-os/rCore-Tutorial-v3.git)。
 
-练习里的所有代码均保留在 repo 中，对每个章节我们开一个 chX 分支。对于“扩展内核”相关的代码练习，修改会直接写在 `os/` 中；对于其它分开的代码，存在根目录下的 `exercise/` 下。具体请切换到对应章节分支查看。
+练习里的所有代码均保留在 repo 中。对于“扩展内核”相关的代码练习，修改会直接写在 `os/` 中；对于其它分开的代码，存在根目录下的 `exercise/` 中。代码按照章节分在各个 chX 分支中（切换到对应分支查看，例如 `git switch ch1`）
 
 ## 第零章：操作系统概述
 
@@ -29,8 +29,16 @@ make docker
 ```bash
 docker image ls # rcore-tutorial-v3
 docker container ls
-docker container rm
+docker container rm rcore-tutorial-v3
 ```
+
+启动容器，编译并在 QEMU 上运行 rCore。构建成功后可以看到可用的 APP 列表，可以运行试试。QEMU 的退出方式：先按 `Ctrl+a`，再按 `x`（如果这个退不了也可以试试直接 `ctrl+c` 或 `ctrl+z` 然后 `kill -9`。
+```bash
+cd os/
+make run
+```
+
+![](figures/rcore_build.png)
 
 Issue: 构建 docker 容器时遇到如下报错
 
