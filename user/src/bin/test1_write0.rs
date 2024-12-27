@@ -12,7 +12,7 @@ use user_lib::{write, STDOUT};
 /// 正确输出：
 /// Test write0 OK!
 
-const STACK_SIZE: usize = 0x1000;
+const STACK_SIZE: usize = 0x2000;
 
 unsafe fn r_sp() -> usize {
     let mut sp: usize;
