@@ -76,11 +76,23 @@
 <a href="#76" id="76">76</a>
 <a href="#77" id="77">77</a>
 <a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::id::TaskUserRes;
 <span class="kw">use super</span>::{kstack_alloc, KernelStack, ProcessControlBlock, TaskContext};
 <span class="kw">use </span><span class="kw">crate</span>::trap::TrapContext;
 <span class="kw">use crate</span>::{mm::PhysPageNum, sync::UPSafeCell};
 <span class="kw">use </span>alloc::sync::{Arc, Weak};
+<span class="kw">use </span>alloc::vec::Vec;
 <span class="kw">use </span>core::cell::RefMut;
 
 <span class="kw">pub struct </span>TaskControlBlock {
@@ -109,6 +121,12 @@
     <span class="kw">pub </span>task_cx: TaskContext,
     <span class="kw">pub </span>task_status: TaskStatus,
     <span class="kw">pub </span>exit_code: <span class="prelude-ty">Option</span>&lt;i32&gt;,
+    <span class="comment">// deadlock detect
+    // length: m
+    </span><span class="kw">pub </span>mutex_allocation: Vec&lt;usize&gt;,
+    <span class="kw">pub </span>mutex_need: Vec&lt;usize&gt;,
+    <span class="kw">pub </span>sem_allocation: Vec&lt;usize&gt;,
+    <span class="kw">pub </span>sem_need: Vec&lt;usize&gt;,
 }
 
 <span class="kw">impl </span>TaskControlBlockInner {
@@ -142,6 +160,10 @@
                     task_cx: TaskContext::goto_trap_return(kstack_top),
                     task_status: TaskStatus::Ready,
                     exit_code: <span class="prelude-val">None</span>,
+                    mutex_allocation: Vec::new(),
+                    mutex_need: Vec::new(),
+                    sem_allocation: Vec::new(),
+                    sem_need: Vec::new(),
                 })
             },
         }

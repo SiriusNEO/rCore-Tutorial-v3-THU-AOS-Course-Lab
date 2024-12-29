@@ -83,6 +83,23 @@
 <a href="#83" id="83">83</a>
 <a href="#84" id="84">84</a>
 <a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     mm::kernel_token,
     task::{add_task, current_task, TaskControlBlock},
@@ -105,7 +122,7 @@
     ));
     <span class="comment">// add new task to scheduler
     </span>add_task(Arc::clone(<span class="kw-2">&amp;</span>new_task));
-    <span class="kw">let </span>new_task_inner = new_task.inner_exclusive_access();
+    <span class="kw">let </span><span class="kw-2">mut </span>new_task_inner = new_task.inner_exclusive_access();
     <span class="kw">let </span>new_task_res = new_task_inner.res.as_ref().unwrap();
     <span class="kw">let </span>new_task_tid = new_task_res.tid;
     <span class="kw">let </span><span class="kw-2">mut </span>process_inner = process.inner_exclusive_access();
@@ -124,6 +141,23 @@
         trap_handler <span class="kw">as </span>usize,
     );
     (<span class="kw-2">*</span>new_task_trap_cx).x[<span class="number">10</span>] = arg;
+
+    <span class="comment">// Copy sync info
+    </span><span class="kw">let </span>task_inner = task.inner_exclusive_access();
+    <span class="kw">for </span>_i <span class="kw">in </span><span class="number">0</span>..task_inner.mutex_allocation.len() {
+        new_task_inner.mutex_allocation.push(<span class="number">0</span>);
+    }
+    <span class="kw">for </span>_i <span class="kw">in </span><span class="number">0</span>..task_inner.mutex_need.len() {
+        new_task_inner.mutex_need.push(<span class="number">0</span>);
+    }
+    <span class="kw">for </span>_i <span class="kw">in </span><span class="number">0</span>..task_inner.sem_allocation.len() {
+        new_task_inner.sem_allocation.push(<span class="number">0</span>);
+    }
+    <span class="kw">for </span>_i <span class="kw">in </span><span class="number">0</span>..task_inner.sem_need.len() {
+        new_task_inner.sem_need.push(<span class="number">0</span>);
+    }
+    drop(task_inner);
+
     new_task_tid <span class="kw">as </span>isize
 }
 

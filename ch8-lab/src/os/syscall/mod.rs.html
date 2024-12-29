@@ -68,6 +68,8 @@
 <a href="#68" id="68">68</a>
 <a href="#69" id="69">69</a>
 <a href="#70" id="70">70</a>
+<a href="#71" id="71">71</a>
+<a href="#72" id="72">72</a>
 </pre></div><pre class="rust"><code><span class="kw">const </span>SYSCALL_DUP: usize = <span class="number">24</span>;
 <span class="kw">const </span>SYSCALL_OPEN: usize = <span class="number">56</span>;
 <span class="kw">const </span>SYSCALL_CLOSE: usize = <span class="number">57</span>;
@@ -95,6 +97,7 @@
 <span class="kw">const </span>SYSCALL_CONDVAR_CREATE: usize = <span class="number">1030</span>;
 <span class="kw">const </span>SYSCALL_CONDVAR_SIGNAL: usize = <span class="number">1031</span>;
 <span class="kw">const </span>SYSCALL_CONDVAR_WAIT: usize = <span class="number">1032</span>;
+<span class="kw">const </span>SYSCALL_ENABLE_DEADLOCK_DETECT: usize = <span class="number">469</span>;
 
 <span class="kw">mod </span>fs;
 <span class="kw">mod </span>process;
@@ -135,6 +138,7 @@
         SYSCALL_CONDVAR_CREATE =&gt; sys_condvar_create(),
         SYSCALL_CONDVAR_SIGNAL =&gt; sys_condvar_signal(args[<span class="number">0</span>]),
         SYSCALL_CONDVAR_WAIT =&gt; sys_condvar_wait(args[<span class="number">0</span>], args[<span class="number">1</span>]),
+        SYSCALL_ENABLE_DEADLOCK_DETECT =&gt; sys_enable_deadlock_detect(args[<span class="number">0</span>]),
         <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"Unsupported syscall_id: {}"</span>, syscall_id),
     }
 }

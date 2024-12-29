@@ -257,6 +257,13 @@
 <a href="#257" id="257">257</a>
 <a href="#258" id="258">258</a>
 <a href="#259" id="259">259</a>
+<a href="#260" id="260">260</a>
+<a href="#261" id="261">261</a>
+<a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::id::RecycleAllocator;
 <span class="kw">use </span><span class="kw">super</span>::manager::insert_into_pid2process;
 <span class="kw">use </span><span class="kw">super</span>::TaskControlBlock;
@@ -292,6 +299,7 @@
     <span class="kw">pub </span>mutex_list: Vec&lt;<span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>Mutex&gt;&gt;&gt;,
     <span class="kw">pub </span>semaphore_list: Vec&lt;<span class="prelude-ty">Option</span>&lt;Arc&lt;Semaphore&gt;&gt;&gt;,
     <span class="kw">pub </span>condvar_list: Vec&lt;<span class="prelude-ty">Option</span>&lt;Arc&lt;Condvar&gt;&gt;&gt;,
+    <span class="kw">pub </span>enable_deadlock_detect: bool,
 }
 
 <span class="kw">impl </span>ProcessControlBlockInner {
@@ -359,6 +367,7 @@
                     mutex_list: Vec::new(),
                     semaphore_list: Vec::new(),
                     condvar_list: Vec::new(),
+                    enable_deadlock_detect: <span class="bool-val">false</span>,
                 })
             },
         });
@@ -406,6 +415,10 @@
         task_inner.res.as_mut().unwrap().ustack_base = ustack_base;
         task_inner.res.as_mut().unwrap().alloc_user_res();
         task_inner.trap_cx_ppn = task_inner.res.as_mut().unwrap().trap_cx_ppn();
+        task_inner.mutex_allocation = Vec::new();
+        task_inner.mutex_need = Vec::new();
+        task_inner.sem_allocation = Vec::new();
+        task_inner.sem_need = Vec::new();
         <span class="comment">// push arguments on user stack
         </span><span class="kw">let </span><span class="kw-2">mut </span>user_sp = task_inner.res.as_mut().unwrap().ustack_top();
         user_sp -= (args.len() + <span class="number">1</span>) * core::mem::size_of::&lt;usize&gt;();
@@ -478,7 +491,8 @@
                     mutex_list: Vec::new(),
                     semaphore_list: Vec::new(),
                     condvar_list: Vec::new(),
-                })
+                    enable_deadlock_detect: parent.enable_deadlock_detect, <span class="comment">// use parent's flag
+                </span>})
             },
         });
         <span class="comment">// add child
