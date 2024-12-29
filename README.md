@@ -14,7 +14,7 @@ rCore 按照内核逐渐完善的顺序从章节1到章节9，每个章节都给
 - [rCore-Tutorial-Test-2024S](https://github.com/LearningOS/rCore-Tutorial-Test-2024S.git)：2024 训练营测试点
 - [rCore-Tutorial-in-single-workspace](https://github.com/YdrMaster/rCore-Tutorial-in-single-workspace/)：没有分支的 rCore-Tutorial，并且附带讲解
 - [rCore-Tutorial V3](https://rcore-os.cn/rCore-Tutorial-deploy/)：rCore 教程，主要面向做实验的同学。
-- [rCore-Tutorial-Guide 2023](https://learningos.cn/rCore-Tutorial-Guide-2023S/index.html)：rCore 2023 春季学期版本教程
+- [rCore-Tutorial-Guide 2023S](https://learningos.cn/rCore-Tutorial-Guide-2023S/index.html)：rCore 2023 春季学期版本教程
 
 ## 第零章：操作系统概述
 
