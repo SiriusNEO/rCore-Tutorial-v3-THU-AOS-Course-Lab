@@ -354,7 +354,7 @@
         }
         ptr.dev = <span class="number">0</span>;
         ptr.ino = inner.inode.as_ref().get_id() <span class="kw">as </span>u64;
-        ptr.nlink = ROOT_INODE.get_num_link(ptr.ino <span class="kw">as </span>u32);
+        ptr.nlink = inner.inode.get_num_link();
         ptr.pad = [<span class="number">0u64</span>; <span class="number">7</span>];
     }
 }
