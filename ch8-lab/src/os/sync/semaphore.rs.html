@@ -132,7 +132,7 @@
         <span class="kw">let </span>current_task = current_task().unwrap();
 
         <span class="kw">if </span>inner.count &gt; <span class="number">0 </span>{
-            current_task.inner_exclusive_access().sem_allocation[<span class="self">self</span>.id] -= <span class="number">1</span>;
+            current_task.inner_exclusive_access().sem_allocation[<span class="self">self</span>.id] += <span class="number">1</span>;
         } <span class="kw">else </span>{
             current_task.inner_exclusive_access().sem_need[<span class="self">self</span>.id] += <span class="number">1</span>;
         }
