@@ -173,11 +173,14 @@ pub fn mutex_create() -> isize {
 pub fn mutex_blocking_create() -> isize {
     sys_mutex_create(true)
 }
-pub fn mutex_lock(mutex_id: usize) {
-    sys_mutex_lock(mutex_id);
+pub fn mutex_lock(mutex_id: usize) -> isize {
+    sys_mutex_lock(mutex_id)
 }
 pub fn mutex_unlock(mutex_id: usize) {
     sys_mutex_unlock(mutex_id);
+}
+pub fn enable_deadlock_detect(enabled: bool) -> isize {
+    sys_enable_deadlock_detect(enabled as usize)
 }
 pub fn semaphore_create(res_count: usize) -> isize {
     sys_semaphore_create(res_count)
@@ -185,8 +188,8 @@ pub fn semaphore_create(res_count: usize) -> isize {
 pub fn semaphore_up(sem_id: usize) {
     sys_semaphore_up(sem_id);
 }
-pub fn semaphore_down(sem_id: usize) {
-    sys_semaphore_down(sem_id);
+pub fn semaphore_down(sem_id: usize) -> isize {
+    sys_semaphore_down(sem_id)
 }
 pub fn condvar_create() -> isize {
     sys_condvar_create()
@@ -202,7 +205,9 @@ pub fn condvar_wait(condvar_id: usize, mutex_id: usize) {
 macro_rules! vstore {
     ($var: expr, $value: expr) => {
         // unsafe { core::intrinsics::volatile_store($var_ref as *const _ as _, $value) }
-        unsafe { core::ptr::write_volatile(core::ptr::addr_of_mut!($var), $value); }
+        unsafe {
+            core::ptr::write_volatile(core::ptr::addr_of_mut!($var), $value);
+        }
     };
 }
 
