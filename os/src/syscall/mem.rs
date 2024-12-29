@@ -13,9 +13,19 @@ pub fn sys_mmap(start: usize, len: usize, prot: usize) -> isize {
         return -1;
     }
 
+    // let mut map_perm = MapPermission::U;
+    // if prot & 0x1 != 0 {
+    //     map_perm |= MapPermission::R;
+    // }
+    // if prot & 0x2 != 0 {
+    //     map_perm |= MapPermission::W;
+    // }
+    // if prot & 0x4 != 0 {
+    //     map_perm |= MapPermission::X;
+    // }
+    let map_perm = MapPermission::from_bits_truncate((prot << 1) as u8) | MapPermission::U; // a fast way
     let start_vpn = VirtAddr::from(start).floor();
     let end_vpn = VirtAddr::from(start + len).ceil();
-    let map_perm = MapPermission::from_bits_truncate((prot << 1) as u8) | MapPermission::U;
     task::map_in_current_task(start_vpn, end_vpn, map_perm)
 }
 
