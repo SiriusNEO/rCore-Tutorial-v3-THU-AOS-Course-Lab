@@ -101,6 +101,8 @@
 <a href="#101" id="101">101</a>
 <a href="#102" id="102">102</a>
 <a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::loader::get_app_data_by_name;
 <span class="kw">use </span><span class="kw">crate</span>::mm::{translated_refmut, translated_str};
 <span class="kw">use </span><span class="kw">crate</span>::task::{
@@ -192,11 +194,13 @@
 </span>}
 
 <span class="kw">pub fn </span>sys_spawn(path: <span class="kw-2">*const </span>u8) -&gt; isize {
-    <span class="kw">let </span>token = current_user_token();
+    <span class="comment">// from sys exec
+    </span><span class="kw">let </span>token = current_user_token();
     <span class="kw">let </span>path = translated_str(token, path);
-    <span class="kw">if let </span><span class="prelude-val">Some</span>(elf_data) = get_app_data_by_name(<span class="kw-2">&amp;</span>path) {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(data) = get_app_data_by_name(<span class="kw-2">&amp;</span>path) {
         <span class="kw">let </span>current_task = current_task().unwrap();
-        <span class="kw">let </span>new_task = current_task.spawn(elf_data);
+        <span class="comment">// call spawn
+        </span><span class="kw">let </span>new_task = current_task.spawn(data);
         <span class="kw">let </span>new_pid = new_task.getpid();
         add_task(new_task);
         new_pid <span class="kw">as </span>isize
