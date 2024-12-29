@@ -62,7 +62,7 @@ impl Semaphore {
         let current_task = current_task().unwrap();
 
         if inner.count > 0 {
-            current_task.inner_exclusive_access().sem_allocation[self.id] += 1;
+            current_task.inner_exclusive_access().sem_allocation[self.id] -= 1;
         } else {
             current_task.inner_exclusive_access().sem_need[self.id] += 1;
         }
