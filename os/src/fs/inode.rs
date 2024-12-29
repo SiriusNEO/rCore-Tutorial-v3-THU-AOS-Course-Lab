@@ -174,7 +174,7 @@ impl File for OSInode {
         }
         ptr.dev = 0;
         ptr.ino = inner.inode.as_ref().get_id() as u64;
-        ptr.nlink = ROOT_INODE.get_num_link(ptr.ino as u32);
+        ptr.nlink = inner.inode.get_num_link();
         ptr.pad = [0u64; 7];
     }
 }
