@@ -54,7 +54,6 @@ impl Semaphore {
 
     pub fn update_task_sem_info_up(&self, task: &mut Arc<TaskControlBlock>) {
         task.inner_exclusive_access().sem_allocation[self.id] += 1;
-        task.inner_exclusive_access().sem_need[self.id] -= 1;
     }
 
     pub fn update_task_sem_info_down(&self) {

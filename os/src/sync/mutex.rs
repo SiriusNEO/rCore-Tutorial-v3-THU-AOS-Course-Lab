@@ -123,7 +123,6 @@ impl Mutex for MutexBlocking {
         if mutex_inner.locked {
             current_task.inner_exclusive_access().mutex_need[self.id] = 1;
         } else {
-            current_task.inner_exclusive_access().mutex_need[self.id] = 0;
             current_task.inner_exclusive_access().mutex_allocation[self.id] = 1;
         }
     }
