@@ -6,8 +6,13 @@ extern crate user_lib;
 
 use user_lib::getpid;
 
+/*
+辅助测例 打印子进程 pid
+*/
+
 #[no_mangle]
 pub fn main() -> i32 {
-    println!("pid {}: Hello world from user mode program!", getpid());
+    let pid = getpid();
+    println!("Test getpid OK! pid = {}", pid);
     0
 }
