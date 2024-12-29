@@ -3,6 +3,7 @@ use super::{kstack_alloc, KernelStack, ProcessControlBlock, TaskContext};
 use crate::trap::TrapContext;
 use crate::{mm::PhysPageNum, sync::UPSafeCell};
 use alloc::sync::{Arc, Weak};
+use alloc::vec::Vec;
 use core::cell::RefMut;
 
 pub struct TaskControlBlock {
@@ -31,6 +32,12 @@ pub struct TaskControlBlockInner {
     pub task_cx: TaskContext,
     pub task_status: TaskStatus,
     pub exit_code: Option<i32>,
+    // deadlock detect
+    // length: m
+    pub mutex_allocation: Vec<usize>,
+    pub mutex_need: Vec<usize>,
+    pub sem_allocation: Vec<usize>,
+    pub sem_need: Vec<usize>,
 }
 
 impl TaskControlBlockInner {
@@ -64,6 +71,10 @@ impl TaskControlBlock {
                     task_cx: TaskContext::goto_trap_return(kstack_top),
                     task_status: TaskStatus::Ready,
                     exit_code: None,
+                    mutex_allocation: Vec::new(),
+                    mutex_need: Vec::new(),
+                    sem_allocation: Vec::new(),
+                    sem_need: Vec::new(),
                 })
             },
         }

@@ -20,7 +20,7 @@ pub fn sys_thread_create(entry: usize, arg: usize) -> isize {
     ));
     // add new task to scheduler
     add_task(Arc::clone(&new_task));
-    let new_task_inner = new_task.inner_exclusive_access();
+    let mut new_task_inner = new_task.inner_exclusive_access();
     let new_task_res = new_task_inner.res.as_ref().unwrap();
     let new_task_tid = new_task_res.tid;
     let mut process_inner = process.inner_exclusive_access();
@@ -39,6 +39,23 @@ pub fn sys_thread_create(entry: usize, arg: usize) -> isize {
         trap_handler as usize,
     );
     (*new_task_trap_cx).x[10] = arg;
+
+    // Copy sync info
+    let task_inner = task.inner_exclusive_access();
+    for _i in 0..task_inner.mutex_allocation.len() {
+        new_task_inner.mutex_allocation.push(0);
+    }
+    for _i in 0..task_inner.mutex_need.len() {
+        new_task_inner.mutex_need.push(0);
+    }
+    for _i in 0..task_inner.sem_allocation.len() {
+        new_task_inner.sem_allocation.push(0);
+    }
+    for _i in 0..task_inner.sem_need.len() {
+        new_task_inner.sem_need.push(0);
+    }
+    drop(task_inner);
+
     new_task_tid as isize
 }
 
