@@ -4,10 +4,12 @@
 //!
 //! `UPSafeCell<OSInodeInner>` -> `OSInode`: for static `ROOT_INODE`,we
 //! need to wrap `OSInodeInner` into `UPSafeCell`
-use super::File;
+use super::{File, Stat, StatMode};
 use crate::drivers::BLOCK_DEVICE;
+use crate::mm::translated_refmut;
 use crate::mm::UserBuffer;
 use crate::sync::UPSafeCell;
+use crate::task::current_user_token;
 use alloc::sync::Arc;
 use alloc::vec::Vec;
 use bitflags::*;
@@ -120,6 +122,16 @@ pub fn open_file(name: &str, flags: OpenFlags) -> Option<Arc<OSInode>> {
     }
 }
 
+/// Link at
+pub fn link_at(old_fn: &str, new_fn: &str) -> isize {
+    ROOT_INODE.link_at(old_fn, new_fn)
+}
+
+/// Unlink at
+pub fn unlink_at(fname: &str) -> isize {
+    ROOT_INODE.unlink_at(fname)
+}
+
 impl File for OSInode {
     fn readable(&self) -> bool {
         self.readable
@@ -150,5 +162,19 @@ impl File for OSInode {
             total_write_size += write_size;
         }
         total_write_size
+    }
+
+    fn get_fstate(&self, buf: *mut Stat) {
+        let ptr = translated_refmut(current_user_token(), buf);
+        let inner = self.inner.exclusive_access();
+        if inner.inode.as_ref().is_dir() {
+            ptr.mode = StatMode::DIR;
+        } else {
+            ptr.mode = StatMode::FILE;
+        }
+        ptr.dev = 0;
+        ptr.ino = inner.inode.as_ref().get_id() as u64;
+        ptr.nlink = ROOT_INODE.get_num_link(ptr.ino as u32);
+        ptr.pad = [0u64; 7];
     }
 }

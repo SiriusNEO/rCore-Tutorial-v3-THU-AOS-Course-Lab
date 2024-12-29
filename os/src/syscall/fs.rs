@@ -1,5 +1,5 @@
 //! File and filesystem-related syscalls
-use crate::fs::{open_file, OpenFlags};
+use crate::fs::{link_at, open_file, unlink_at, OpenFlags, Stat};
 use crate::mm::{translated_byte_buffer, translated_str, UserBuffer};
 use crate::task::{current_task, current_user_token};
 
@@ -68,4 +68,31 @@ pub fn sys_close(fd: usize) -> isize {
     }
     inner.fd_table[fd].take();
     0
+}
+
+pub fn sys_fstat(fd: usize, st: *mut Stat) -> isize {
+    let task = current_task().unwrap();
+    let inner = task.inner_exclusive_access();
+    if inner.fd_table.len() <= fd {
+        return -1;
+    }
+    if let Some(file) = &inner.fd_table[fd] {
+        let file = file.clone();
+        drop(inner);
+        file.get_fstate(st);
+        return 0;
+    }
+    -1
+}
+
+pub fn sys_linkat(_fd: usize, old_fn: *const u8, new_fn: *const u8) -> isize {
+    let current_token = current_user_token();
+    let new = translated_str(current_token, new_fn);
+    let old = translated_str(current_token, old_fn);
+    link_at(old.as_str(), new.as_str())
+}
+
+pub fn sys_unlinkat(_fd: usize, fname: *const u8) -> isize {
+    let current_token = current_user_token();
+    unlink_at(translated_str(current_token, fname).as_str())
 }

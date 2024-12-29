@@ -112,3 +112,46 @@ pub fn sleep(period_ms: usize) {
         sys_yield();
     }
 }
+
+const AT_FDCWD: isize = -100;
+
+pub fn unlink(path: &str) -> isize {
+    assert!(path.ends_with('\0'));
+    sys_unlinkat(AT_FDCWD, path)
+}
+
+pub fn link(oldpath: &str, newpath: &str) -> isize {
+    assert!(oldpath.ends_with('\0'));
+    assert!(newpath.ends_with('\0'));
+    sys_linkat(AT_FDCWD, oldpath, newpath)
+}
+
+#[repr(C)]
+#[derive(Debug, Default)]
+pub struct Stat {
+    pub dev: u64,
+    pub ino: u64,
+    pub mode: StatMode,
+    pub nlink: u32,
+    pad: [u64; 7],
+}
+impl Stat {
+    pub fn new() -> Self {
+        Self::default()
+    }
+}
+
+bitflags! {
+    #[derive(Default)]
+    pub struct StatMode: u32 {
+        const NULL  = 0;
+        /// directory
+        const DIR   = 0o040000;
+        /// ordinary regular file
+        const FILE  = 0o100000;
+    }
+}
+
+pub fn fstat(fd: usize, stat: &mut Stat) -> isize {
+    sys_fstat(fd, stat)
+}
