@@ -15,6 +15,7 @@ mod switch;
 mod task;
 
 use crate::loader::{get_app_data, get_num_app};
+use crate::mm::{MapPermission, VPNRange, VirtPageNum};
 use crate::sbi::shutdown;
 use crate::sync::UPSafeCell;
 use crate::trap::TrapContext;
@@ -203,4 +204,36 @@ pub fn current_trap_cx() -> &'static mut TrapContext {
 /// Change the current 'Running' task's program break
 pub fn change_program_brk(size: i32) -> Option<usize> {
     TASK_MANAGER.change_current_program_brk(size)
+}
+
+pub fn map_in_current_task(
+    start_vpn: VirtPageNum,
+    end_vpn: VirtPageNum,
+    map_perm: MapPermission,
+) -> isize {
+    let mut inner = TASK_MANAGER.inner.exclusive_access();
+    let current = inner.current_task;
+    let mem_set = &mut inner.tasks[current].memory_set;
+    for vpn in VPNRange::new(start_vpn, end_vpn) {
+        match mem_set.translate(vpn) {
+            Some(pte) if pte.is_valid() => return -1, // invalid pte
+            _ => {}
+        }
+    }
+    mem_set.insert_framed_area(start_vpn.into(), end_vpn.into(), map_perm);
+    0
+}
+
+pub fn unmap_in_current_task(start_vpn: VirtPageNum, end_vpn: VirtPageNum) -> isize {
+    let mut inner = TASK_MANAGER.inner.exclusive_access();
+    let current = inner.current_task;
+    let mem_set = &mut inner.tasks[current].memory_set;
+    for vpn in VPNRange::new(start_vpn, end_vpn) {
+        match mem_set.translate(vpn) {
+            Some(pte) if !pte.is_valid() => return -1, // invalid pte
+            Some(_) => mem_set.page_table.unmap(vpn),
+            _ => return -1, // no entry
+        }
+    }
+    0
 }
