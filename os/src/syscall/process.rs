@@ -89,11 +89,13 @@ pub fn sys_waitpid(pid: isize, exit_code_ptr: *mut i32) -> isize {
 }
 
 pub fn sys_spawn(path: *const u8) -> isize {
+    // from sys exec
     let token = current_user_token();
     let path = translated_str(token, path);
-    if let Some(elf_data) = get_app_data_by_name(&path) {
+    if let Some(data) = get_app_data_by_name(&path) {
         let current_task = current_task().unwrap();
-        let new_task = current_task.spawn(elf_data);
+        // call spawn
+        let new_task = current_task.spawn(data);
         let new_pid = new_task.getpid();
         add_task(new_task);
         new_pid as isize

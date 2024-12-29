@@ -170,6 +170,7 @@ impl TaskControlBlock {
         self.pid.0
     }
 
+    /// Basically, spawn = fork + exec
     pub fn spawn(self: &Arc<TaskControlBlock>, elf_data: &[u8]) -> Arc<TaskControlBlock> {
         // ---- access parent PCB exclusively
         let mut parent_inner = self.inner_exclusive_access();
