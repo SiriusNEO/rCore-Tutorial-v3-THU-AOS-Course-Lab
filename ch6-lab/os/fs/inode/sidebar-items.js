@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["link_at","list_apps","open_file","unlink_at"],"struct":["OSInode","OSInodeInner","OpenFlags","ROOT_INODE"]};
