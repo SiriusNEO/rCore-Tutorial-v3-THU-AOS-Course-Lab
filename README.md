@@ -335,9 +335,9 @@ easy-fs 自下而上可以分为五层：
 - 分支：`ch6-lab`
 - 运行： `make run`，在 Terminal 中逐个运行 `file0~file3` 这些看到测试，看到期望输出。
 
-本次实现这些功能要改动的地方，需要修改 easy-fs 以及 os 内核代码本身。首先，stat 只要暴露出对应接口拿到对应信息即可。对于 `sys_linkat`，我们找到先找到 old filename 对应的 ino_id，然后新建 DirEntry 写入 root inode 中；对于 `sys_unlinkat`，我们先找到需要删除的 inode，查看其 num_link 并将其减 1。如果计数减到 0，我们会调用 clear 清楚其信息。
+本次实现这些功能要改动的地方，需要修改 easy-fs 以及 os 内核代码本身。首先，stat 只要暴露出对应接口拿到对应信息即可。对于 `sys_linkat`，我们找到先找到 old filename 对应的 ino_id，然后新建 DirEntry 写入 root inode 中；对于 `sys_unlinkat`，我们先找到需要删除的 inode，查看其 num_link 并将其减 1。如果计数减到 0，我们会调用 clear 清除其对应的 DiskInode 信息。注意不论如何，unlink 都要删除 root inode 中对这一 inode 的索引信息。我们这里做的比较粗糙，做法是直接将对应位置的 dirent 置空；但是我们的 link 每次会往 root inode 的最后面写 dirent，这样其实随着文件系统的使用会有越来越多的碎片（即我们中间留下的空 dirent）。一个简单的改进可以是，我们在 unlink 时找到要删除的 dirent，然后将 root inode 的最后一个 dirent 和其交换。由于我们寻找 dirent 都是用 for 循环的方式，这一操作不会影响其它 dirent 后续的寻找，同时解决了碎片问题。实际的文件系统可能有更加高效的回收方式。
 
-在实现的过程中，一个比较需要注意的事情是我们需要合理使用 对于整个文件系统的 Mutex 来保证不发生 concurrent 的读写。通常我们会在一个文件系统接口的开头调用 `lock()` 来锁住当前操作，然后在执行完之后 drop 掉。
+在实现的过程中，一个比较需要注意的事情是我们需要合理使用 对于整个文件系统的 Mutex 来保证不发生 concurrent 的读写。通常我们会在一个文件系统接口的开头调用 `lock()` 来锁住当前操作，然后在执行完之后释放掉。
 
 ## 第七章：进程间通信与 I/O 重定向
 
