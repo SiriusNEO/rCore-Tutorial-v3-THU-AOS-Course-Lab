@@ -67,7 +67,6 @@
 <a href="#67" id="67">67</a>
 <a href="#68" id="68">68</a>
 <a href="#69" id="69">69</a>
-<a href="#70" id="70">70</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::sync::UPSafeCell;
 <span class="kw">use </span><span class="kw">crate</span>::task::{
     block_current_and_run_next, current_process, current_task, wakeup_task, TaskControlBlock,
@@ -124,7 +123,6 @@
 
     <span class="kw">pub fn </span>update_task_sem_info_up(<span class="kw-2">&amp;</span><span class="self">self</span>, task: <span class="kw-2">&amp;mut </span>Arc&lt;TaskControlBlock&gt;) {
         task.inner_exclusive_access().sem_allocation[<span class="self">self</span>.id] += <span class="number">1</span>;
-        task.inner_exclusive_access().sem_need[<span class="self">self</span>.id] -= <span class="number">1</span>;
     }
 
     <span class="kw">pub fn </span>update_task_sem_info_down(<span class="kw-2">&amp;</span><span class="self">self</span>) {
